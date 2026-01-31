@@ -22,12 +22,16 @@ class Sudoku:
         self.possibleCells = self.initialiseSolver()
     
     def setSizes(self):
-        # Sets line and puzzle element sizes for future reference
+        """ Sets line and puzzle element sizes for future reference """
         self.lineSize = self.sudokuSize ** 2
         self.puzzleSize = self.sudokuSize ** 4
 
     def initialiseSolver(self) -> list:
-        # Generates a multi-dimensional array for all 81 cells
+        """ Generates a multi-dimensional square array for all cells
+        
+        :return: list of cells
+        :rtype: list
+        """
         # Each cell contains the numbers 1 - 9, used to determine the solution to the puzzle
         allCells_list = []
         # No target list required, so an underscore can be used
@@ -45,18 +49,33 @@ class Sudoku:
         return allCells_list
 
     def getRow(self, rowNum: int) -> str:
+        """ Retrieves one line of cells 
+        
+        :return: row
+        :rtype: str
+        """
         startIdx = self.lineSize * rowNum
         # Returns a 9-element array of a specified row
         row = self.puzzle[startIdx : startIdx + self.lineSize]
         return row
     
     def getCol(self, colNum: int) -> str:
+        """ Retrieves one line of cells 
+        
+        :return: column
+        :rtype: str
+        """
         # Returns a 9-element array of a specified column
         col = self.puzzle[colNum : self.puzzleSize : self.lineSize]
         return col
     
     def getSquarePuzzle(self) -> list:
-        # Returns a square format, useful for debugging
+        """ Retrieves each cell in a square format, used for debugging
+        
+        :return: square
+        :rtype: list
+        """
+       
         # Typically size 9-by-9
         squareForm = []
         for rowIdx in range(0, self.lineSize):
@@ -65,6 +84,11 @@ class Sudoku:
         return squareForm
     
     def getSquareSolution(self) -> list:
+        """ Returns the solution of the Sudoku in a square format
+
+        :return: solution
+        :rtype: list
+        """
         # Returns a square format, useful for debugging
         # Typically size 9-by-9
         squareForm = []
@@ -74,6 +98,11 @@ class Sudoku:
         return squareForm        
 
     def getSquare(self, squareNum: int) -> str:
+        """ Retrieves a square of cells 
+        
+        :return: square
+        :rtype: str
+        """
         # Typically returns a 9-element string
         # Eventually contains each digit from 1 - 9 (Sudoku rules)
         # Square order starts top left, ends bottom right:
@@ -95,6 +124,7 @@ class Sudoku:
         return square
 
     def iteration(self):
+        """ Infinite loop to control solving algorithm """
         solved = False
         while solved == False:
             self.solve()
@@ -111,6 +141,12 @@ class Sudoku:
         """ Progress: {round(100 * iteration / self.num_of_iterations)}% """  
 
     def attemptSolve(self) -> bool:
+        """
+        Iterates the solution method, with verification for unsolvable puzzles
+
+        :return: Sudoku solved state
+        :rtype: bool
+        """
         # Attempts to solve the Sudoku. If no progress is made, the algorithm has failed
         # Returns a boolean result, detailing the result of the algorithm
         
@@ -142,6 +178,12 @@ class Sudoku:
         return True
 
     def getProgress(self) -> int:
+        """
+        Finds number of solved cells
+        
+        :return: number of solved cells
+        :rtype: int
+        """
         # Determines the number of solved elements
         zeroCount = 0
         for element in self.puzzle:
@@ -149,6 +191,7 @@ class Sudoku:
         return self.puzzleSize - zeroCount
 
     def solve(self):
+        """ Single iteration of solve """
         # A single iteration towards the final solution
         for rowIdx in range(self.lineSize):
             # 'x' component to determine square quadrant
@@ -232,6 +275,14 @@ class Sudoku:
             self.nakedPairAttemptPlace(rowDigits, rowAddresses)
 
     def getRowAddresses(self, rowIdx: int) -> list:
+        """
+        Gets addresses of each cell from a row
+        
+        :param rowIdx: row index
+        :type rowIdx: int
+        :return: cell addresses
+        :rtype: list
+        """
         # Returns a list of addresses for a given row
         elementList = []
         for xIdx in range(self.lineSize):
@@ -242,6 +293,14 @@ class Sudoku:
         return elementList
 
     def getColAddresses(self, colIdx: int) -> list:
+        """
+        Gets addresses of each cell from a column
+        
+        :param rowIdx: column index
+        :type rowIdx: int
+        :return: cell addresses
+        :rtype: list
+        """
         # Returns a list of addresses for a given column
         elementList = []
         for yIdx in range(self.lineSize):
@@ -251,6 +310,14 @@ class Sudoku:
         return elementList
 
     def getSquareAddresses(self, squareIdx: int) -> list:
+        """
+        Returns the addresses of elements from a particular square
+
+        :param squareIdx: number to address square
+        :type squareIdx: int
+        :return: addresses of elements in square
+        :rtype: list
+        """
         # Returns a list of element numbers - corresponding to a given square
         # Uses a modified 'getSquare' algorithm to determine indexes of the specified elements from said square
         elementList = []
@@ -270,6 +337,14 @@ class Sudoku:
         return elementList
 
     def getGroupPossibleDigits(self, indexes: list) -> list:
+        """
+        Returns each explicit digit from a group of elements
+
+        :param indexes: indexes of any element from the group
+        :type indexes: list
+        :return: all explicit digits found in this group
+        :rtype: list
+        """
         # Returns a 2D array of possible digits from a given group
         # Group is IMPLIED - not explicitly given - addresses are used instead!
 
@@ -280,6 +355,14 @@ class Sudoku:
         return possibleDigitsArray
 
     def nakedSingleAttemptPlace(self, group: list, addresses: list):
+        """
+        Exposed single digit place attempt
+        
+        :param group: group of elements, each with possible digits
+        :type group: list
+        :param addresses: addresses of each member in the group
+        :type addresses: list
+        """
         # Naked single digits are single exposed digits which can be placed
 
         # Analyses the possible digits in a group of elements
@@ -298,6 +381,16 @@ class Sudoku:
                         self.removeInvalidDigits(address, [digit])
 
     def getDigitOccurances(self, group: list) -> list:
+        """
+        Finds number of occurances of each possible digit, from elements within a group.
+
+        Used to find single instances, for implied digit placement
+    
+        :param group: group of unconfirmed digits
+        :type group: list
+        :return: number of appearances of each digit (looking for 1 appearance!)
+        :rtype: list
+        """
         # Returns a list of appearances for each digit
         # Digit in question is the INDEX of appearance
         digitInstances = [0] * self.lineSize
@@ -312,6 +405,14 @@ class Sudoku:
         return digitInstances
 
     def removeInvalidDigits(self, elementIdx: int, confirmedDigits: list):
+            """
+            Removes multiple invalid digits from an element, if the confirmed digit has been found
+            
+            :param elementIdx: element address
+            :type elementIdx: int
+            :param confirmedDigits: explicitly confirmed digit solution
+            :type confirmedDigits: list
+            """
             # When a digit is confirmed to be in an element, removes all other possible digits
             for digit in range(1, self.lineSize + 1):
                 if digit not in confirmedDigits: self.possibleCells[elementIdx][digit - 1] = 0
@@ -319,6 +420,14 @@ class Sudoku:
                 else: self.possibleCells[elementIdx][digit - 1] = digit
 
     def nakedPairAttemptPlace(self, possibleDigitsGroup: list, addresses: list):
+        """
+        Checks for a pair of elements who share two possible digits, eliminating them from the line
+        
+        :param possibleDigitsGroup: list of possible digits for each element in the group
+        :type possibleDigitsGroup: list
+        :param addresses: address of each element in the group
+        :type addresses: list
+        """
         # Checks a group to determine if a pair of elements contain the same two possible digits
         # Successful naked pairs constrain the location of said digits to somewhere in either element
         # As such, it is impossible for those digits to be contained elsewhere in the group!
@@ -357,6 +466,14 @@ class Sudoku:
                 instanceAdr.clear()
 
     def checkPossibleDigits(self, elementIdx: int) -> int:
+        """
+        Checks which digits an element could be
+        
+        :param elementIdx: element address
+        :type elementIdx: int
+        :return: possible digit (-1 if multiple or none)
+        :rtype: int
+        """
         # Used to check if only a single digit is valid in a given element
 
         # Retrieves the possible digits for a given element
@@ -377,6 +494,14 @@ class Sudoku:
 
 
     def checkSquareLineInteractions(self, square: list, addresses: list):
+        """
+        Checks interactions with a square in the puzzle and common lines
+        
+        :param square: cells to form a square
+        :type square: list
+        :param addresses: addresses for each cell
+        :type addresses: list
+        """
         # Checks square. If a group of digits are only valid on the same line (row or column):
         # Remove instances of digit in question from elsewhere in line (not in current square)
         
@@ -417,6 +542,14 @@ class Sudoku:
             coordinateList.clear()
 
     def removePossibleDigit(self, elementIdx: int, toRemove: int):
+        """
+        Removes a single impossible digit from cell list
+
+        :param elementIdx: element index
+        :type elementIdx: int
+        :param toRemove: confirmed impossible digit
+        :type toRemove: int
+        """
         # Removes a single invalid digit from the possible digits list
         for digitIdx in range(self.lineSize):
             if self.possibleCells[elementIdx][digitIdx] == toRemove:
@@ -424,6 +557,14 @@ class Sudoku:
 
 
     def getCoordinates(self, address: int) -> list:
+        """
+        Converts cell number into x,y coordinates
+        
+        :param address: element number
+        :type address: int
+        :return: x,y coordinates
+        :rtype: list
+        """
         # Converts an integer element address into a 2D coordinate
          
         # x uses modulus, y uses integer division
@@ -434,6 +575,14 @@ class Sudoku:
         return [xComponent, yComponent]
 
     def getRowShape(self, coords: list) -> int:
+        """
+        Checks to see if each selected element shares the same row
+
+        :param coords: element addresses
+        :type coords: list
+        :return: shared row number (-1 if not shared)
+        :rtype: int
+        """
         # Coordinates stored in a 2D array, using 0th element to check row
         rowNum = coords[0][1]
         for coordinate in coords:
@@ -450,6 +599,14 @@ class Sudoku:
         
 
     def getColShape(self, coords: list) -> int:
+        """
+        Checks to see if each selected element shares the same column
+
+        :param coords: element addresses
+        :type coords: list
+        :return: shared column number (-1 if not shared)
+        :rtype: int
+        """
         # Columns stored in the 1st element 
         colNum = coords[0][0]
         for coordinate in coords:
@@ -464,11 +621,25 @@ class Sudoku:
         return colNum
 
     def updatePuzzle(self, elementIdx: int, digit: int):
+        """
+        Updates cells with confirmed digits from the current iteration
+
+        :param elementIdx: cell index
+        :type elementIdx: int
+        :param digit: confirmed digit
+        :type digit: int
+        """
         originalStr = self.puzzle[0 : self.puzzleSize]
         newStr = originalStr[0 : elementIdx] + str(digit) + originalStr[elementIdx + 1 : self.puzzleSize]
         self.puzzle = newStr
 
     def verifySolution(self) -> bool:
+        """
+        Compares current cells with solution
+
+        :return: is the puzzle solved?
+        :rtype: bool
+        """
         # Returns boolean comparing current solution to intended one
 
         # Boolean generated through comparison
@@ -486,14 +657,19 @@ class Sudoku:
         return square
 
     def removeInvalidDigitsSingle(self, elementIdx, confirmedDigit):
+        """
+        Removes all impossible digits from list, for an individual cell
+        
+        :param elementIdx: element address
+        :param confirmedDigit: confirmed digit, part of the solution
+        """
+        # NOTE: redundant once 'removeInvalidDigits' is sorted
 
-            # NOTE: redundant once 'removeInvalidDigits' is sorted
-
-            # When a digit is confirmed to be in an element, removes all other possible digits
-            for digit in range(1, self.lineSize + 1):
-                if digit != confirmedDigit: self.possibleCells[elementIdx][digit - 1] = 0
-                # Used when a SINGLE VALID DIGIT is located
-                else: self.possibleCells[elementIdx][digit - 1] = digit
+        # When a digit is confirmed to be in an element, removes all other possible digits
+        for digit in range(1, self.lineSize + 1):
+            if digit != confirmedDigit: self.possibleCells[elementIdx][digit - 1] = 0
+            # Used when a SINGLE VALID DIGIT is located
+            else: self.possibleCells[elementIdx][digit - 1] = digit
 
 # Connecting to YouDoSudoku API - generates random Sudoku!
 if __name__ == "__main__":
